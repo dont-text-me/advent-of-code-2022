@@ -1,7 +1,5 @@
 import Data.List (intercalate, sort)
 import Data.Text (splitOn, pack, unpack, Text)
-import Distribution.Simple.Utils (xargs)
-
 
 ----day 1
 getCalsPerElf :: String -> IO [Int]

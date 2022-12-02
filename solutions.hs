@@ -56,7 +56,7 @@ pointsForMove Paper = 2
 pointsForMove Scissors = 3
 
 codes ::  IO [(String, String)]
-codes = readFile "inputs/day2.txt" >>= return . lines >>= return . map words >>= return . map (\x -> ( head x, head $ tail x))
+codes = readFile "inputs/day2.txt" >>= return . map ((\x -> ( head x, head $ tail x)) . words) . lines
 
 day2p1 :: IO Int
 day2p1 = sum . map (\(opponent, player) -> (pointsForMove (encoding player)) + (points $ play (encoding opponent, encoding player)) ) <$> codes

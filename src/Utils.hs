@@ -1,7 +1,8 @@
+module Utils where
+
 import Data.List (intercalate, sort, intersect, splitAt)
 import Data.Text (splitOn, pack, unpack, Text)
 import Data.Char (isLower)
-import DynFlags (xFlags)
 
 ----day 1
 getCalsPerElf :: String -> IO [Int]
@@ -12,7 +13,6 @@ day1p1 = head <$> getCalsPerElf "inputs/day1.txt"
 
 day1p2 :: IO Int
 day1p2 = sum . take 3 <$> getCalsPerElf "inputs/day1.txt"
-
 -------day 2
 
 data Outcome = Win | Loss | Draw deriving (Eq)

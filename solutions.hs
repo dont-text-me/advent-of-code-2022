@@ -1,5 +1,7 @@
-import Data.List (intercalate, sort)
+import Data.List (intercalate, sort, intersect, splitAt)
 import Data.Text (splitOn, pack, unpack, Text)
+import Data.Char (isLower)
+import DynFlags (xFlags)
 
 ----day 1
 getCalsPerElf :: String -> IO [Int]
@@ -61,3 +63,32 @@ day2p1 = sum . map (\(opponent, player) -> (pointsForMove (encoding player)) + (
 
 day2p2 :: IO Int
 day2p2 = sum . map (\(opponent, outcome) -> (points $ outcomeEncoding outcome) + (pointsForMove $ moveForOutcome (outcomeEncoding outcome) (encoding opponent))) <$> codes
+
+
+-----day 3
+
+splitIntoGroups :: Int -> [a] -> [[a]]
+splitIntoGroups _ [] = []
+splitIntoGroups n xs = g : splitIntoGroups n gs where (g, gs) = splitAt n xs
+
+intersect3 :: Eq a => [a] -> [a] -> [a] -> [a]
+intersect3 as bs cs = as `intersect` bs `intersect` cs
+
+sacks :: IO [String]
+sacks = lines <$> readFile "inputs/day3.txt"
+
+getRepeating :: String -> Char
+getRepeating xs = head $ intersect fh sh where
+    fh = take midway xs
+    sh = drop midway xs 
+    midway = length xs `div` 2
+
+priority :: Char -> Int
+priority x | isLower x = fromEnum x - 96
+           | otherwise = fromEnum x - 38
+
+day3p1 :: IO Int
+day3p1 = sum . map (priority . getRepeating) <$> sacks
+
+day3p2 :: IO Int
+day3p2 = sum . map (\[a, b, c] -> priority $ head $ intersect3 a b c) . splitIntoGroups 3 <$> sacks

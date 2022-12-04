@@ -7,7 +7,7 @@ import Data.Char (isLower)
 import Data.List.Split
 ----day 1
 getCalsPerElf :: String -> IO [Int]
-getCalsPerElf path = readFile path >>= (\x -> return $ reverse $ sort ( map (foldr (\a acc -> (read a :: Int) + acc ) 0 . splitOn  ",") $ splitOn  ",," (  (intercalate "," (lines x)))))
+getCalsPerElf path = readFile path >>= (\x -> return $ reverse $ sort ( map (foldr (\a acc -> (read a :: Int) + acc ) 0 . splitOn  ",") $ splitOn  ",," (  intercalate "," (lines x))))
 
 day1p1 :: IO Int
 day1p1 = head <$> getCalsPerElf "inputs/day1.txt"
@@ -57,13 +57,13 @@ pointsForMove Paper = 2
 pointsForMove Scissors = 3
 
 codes ::  IO [(String, String)]
-codes = readFile "inputs/day2.txt" >>= return . map ((\x -> ( head x, head $ tail x)) . words) . lines
+codes = readFile "inputs/day2.txt" Data.Functor.<&> (map ((\x -> ( head x, head $ tail x)) . words) . lines)
 
 day2p1 :: IO Int
-day2p1 = sum . map (\(opponent, player) -> (pointsForMove (encoding player)) + (points $ play (encoding opponent, encoding player)) ) <$> codes
+day2p1 = sum . map (\(opponent, player) -> pointsForMove (encoding player) + points (play (encoding opponent, encoding player)) ) <$> codes
 
 day2p2 :: IO Int
-day2p2 = sum . map (\(opponent, outcome) -> (points $ outcomeEncoding outcome) + (pointsForMove $ moveForOutcome (outcomeEncoding outcome) (encoding opponent))) <$> codes
+day2p2 = sum . map (\(opponent, outcome) -> points (outcomeEncoding outcome) + pointsForMove (moveForOutcome (outcomeEncoding outcome) (encoding opponent))) <$> codes
 
 
 -----day 3
@@ -102,7 +102,7 @@ tuplify s = (from, to) where
     to = read (head $ tail $ splitOn "-" s) :: Int
 
 rangeContains :: (Int, Int) -> (Int, Int) -> Bool
-rangeContains (fromA, toA) (fromB, toB) = (fromA <= fromB && toA >= toB) || (fromB <= fromA && toB >= toA)
+rangeContains (fromA, toA) (fromB, toB) = fromA <= fromB && toA >= toB || fromB <= fromA && toB >= toA
 
 rangeOverlaps :: (Int, Int) -> (Int, Int) -> Bool
 rangeOverlaps as bs =  not (null ([smA .. lgA] `intersect` [smB .. lgB])) where
@@ -112,7 +112,7 @@ rangeOverlaps as bs =  not (null ([smA .. lgA] `intersect` [smB .. lgB])) where
     lgB = uncurry max bs
 
 ranges :: IO [[(Int, Int)]]
-ranges = readFile "inputs/day4.txt" >>= return . map (splitOn ",") . lines >>= return . map (map tuplify)
+ranges = (readFile "inputs/day4.txt" >>= return . map (splitOn ",") . lines) Data.Functor.<&> map (map tuplify)
 
 day4p1 :: IO Int
 day4p1 = sum . map (\x -> if rangeContains (head x) (head $ tail x) then 1 else 0) <$> ranges

@@ -1,12 +1,13 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use <&>" #-}
 module Utils where
 
-import Data.List (intercalate, sort, intersect, splitAt)
-import Data.Text (splitOn, pack, unpack, Text)
+import Data.List (intercalate, sort, intersect)
 import Data.Char (isLower)
-
+import Data.List.Split
 ----day 1
 getCalsPerElf :: String -> IO [Int]
-getCalsPerElf path = readFile path >>= (\x -> return $ reverse $ sort ( map (foldr (\a acc -> (read (unpack a) :: Int) + acc ) 0 . splitOn (pack ",")) $ splitOn (pack ",,") (pack  (intercalate "," (lines x)))))
+getCalsPerElf path = readFile path >>= (\x -> return $ reverse $ sort ( map (foldr (\a acc -> (read a :: Int) + acc ) 0 . splitOn  ",") $ splitOn  ",," (  (intercalate "," (lines x)))))
 
 day1p1 :: IO Int
 day1p1 = head <$> getCalsPerElf "inputs/day1.txt"
@@ -40,7 +41,7 @@ play moves@(opponent, player) | opponent == player = Draw
                               | otherwise = Loss
 
 
-outcomeEncoding :: String -> Outcome 
+outcomeEncoding :: String -> Outcome
 outcomeEncoding "X" = Loss
 outcomeEncoding "Y" = Draw
 outcomeEncoding "Z" = Win
@@ -80,7 +81,7 @@ sacks = lines <$> readFile "inputs/day3.txt"
 getRepeating :: String -> Char
 getRepeating xs = head $ intersect fh sh where
     fh = take midway xs
-    sh = drop midway xs 
+    sh = drop midway xs
     midway = length xs `div` 2
 
 priority :: Char -> Int
@@ -92,3 +93,25 @@ day3p1 = sum . map (priority . getRepeating) <$> sacks
 
 day3p2 :: IO Int
 day3p2 = sum . map (\[a, b, c] -> priority $ head $ intersect3 a b c) . splitIntoGroups 3 <$> sacks
+
+--day 4
+
+tuplify :: String -> (Int, Int)
+tuplify s = (from, to) where
+    from = read (head $ splitOn "-" s) :: Int
+    to = read (head $ tail $ splitOn "-" s) :: Int
+
+rangeContains :: (Int, Int) -> (Int, Int) -> Bool
+rangeContains (fromA, toA) (fromB, toB) = (fromA <= fromB && toA >= toB) || (fromB <= fromA && toB >= toA)
+
+rangeOverlaps :: (Int, Int) -> (Int, Int) -> Bool
+rangeOverlaps (fromA, toA) (fromB, toB) =  not (null ([fromA .. toA] `intersect` [fromB .. toB]))
+
+ranges :: IO [[(Int, Int)]]
+ranges = readFile "inputs/day4.txt" >>= return . map (splitOn ",") . lines >>= return . map (map tuplify)
+
+day4p1 :: IO Int
+day4p1 = sum . map (\x -> if rangeContains (head x) (head $ tail x) then 1 else 0) <$> ranges
+
+day4p2 :: IO Int
+day4p2 = sum . map (\x -> if rangeOverlaps (head x) (head $ tail x) then 1 else 0) <$> ranges

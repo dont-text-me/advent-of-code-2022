@@ -22,6 +22,9 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - text
+- hspec
+- hspec-discover
+- split
 
 ghc-options:
 - -Wall
@@ -49,9 +52,18 @@ executables:
     - aoc2022
 
 tests:
-  aoc2022-test:
-    main:                Spec.hs
-    source-dirs:         test
+  unit:
+    main:                Main.hs
+    source-dirs:         test/unit
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc2022
+  integration:
+    main:                Main.hs
+    source-dirs:         test/integration
     ghc-options:
     - -threaded
     - -rtsopts

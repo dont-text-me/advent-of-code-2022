@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use <&>" #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 module Utils where
 
 import Data.List (intercalate, sort, intersect)
@@ -57,7 +58,7 @@ pointsForMove Paper = 2
 pointsForMove Scissors = 3
 
 codes ::  IO [(String, String)]
-codes = readFile "inputs/day2.txt" Data.Functor.<&> (map ((\x -> ( head x, head $ tail x)) . words) . lines)
+codes = readFile "inputs/day2.txt" >>= return . (map ((\x -> ( head x, head $ tail x)) . words) . lines)
 
 day2p1 :: IO Int
 day2p1 = sum . map (\(opponent, player) -> pointsForMove (encoding player) + points (play (encoding opponent, encoding player)) ) <$> codes
@@ -112,7 +113,7 @@ rangeOverlaps as bs =  not (null ([smA .. lgA] `intersect` [smB .. lgB])) where
     lgB = uncurry max bs
 
 ranges :: IO [[(Int, Int)]]
-ranges = (readFile "inputs/day4.txt" >>= return . map (splitOn ",") . lines) Data.Functor.<&> map (map tuplify)
+ranges = (readFile "inputs/day4.txt" >>= return . map (splitOn ",") . lines) >>= return . map (map tuplify)
 
 day4p1 :: IO Int
 day4p1 = sum . map (\x -> if rangeContains (head x) (head $ tail x) then 1 else 0) <$> ranges

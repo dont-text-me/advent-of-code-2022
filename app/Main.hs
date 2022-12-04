@@ -11,5 +11,5 @@ main = do
     day <- read <$> getLine
     putStrLn "choose part"
     part <- read <$> getLine
-    ans <- (days !! ((day + part) + 1))
+    ans <- days !! (day + part + 1)
     print ans

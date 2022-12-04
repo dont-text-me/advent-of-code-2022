@@ -76,7 +76,6 @@ test-suite unit
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      OtherSpec
       UtilsSpec
       Paths_aoc2022
   hs-source-dirs:

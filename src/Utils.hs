@@ -105,7 +105,11 @@ rangeContains :: (Int, Int) -> (Int, Int) -> Bool
 rangeContains (fromA, toA) (fromB, toB) = (fromA <= fromB && toA >= toB) || (fromB <= fromA && toB >= toA)
 
 rangeOverlaps :: (Int, Int) -> (Int, Int) -> Bool
-rangeOverlaps (fromA, toA) (fromB, toB) =  not (null ([fromA .. toA] `intersect` [fromB .. toB]))
+rangeOverlaps as bs =  not (null ([smA .. lgA] `intersect` [smB .. lgB])) where
+    smA = uncurry min as
+    lgA = uncurry max as
+    smB = uncurry min bs
+    lgB = uncurry max bs
 
 ranges :: IO [[(Int, Int)]]
 ranges = readFile "inputs/day4.txt" >>= return . map (splitOn ",") . lines >>= return . map (map tuplify)

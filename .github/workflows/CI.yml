@@ -9,6 +9,7 @@ on:
 jobs:
   lint:
     name: Lint
+    if: success()
     runs-on: ubuntu-latest
     steps: 
     - name: Checkout code
@@ -23,6 +24,7 @@ jobs:
         hlint .
   build:
     name : Build
+    if: success()
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -31,6 +33,7 @@ jobs:
       run: stack build
   test-unit:
       name: Unit tests
+      if: success()
       runs-on: ubuntu-latest
       steps:
       - name: Checkout code
@@ -39,6 +42,7 @@ jobs:
         run: stack test :unit
   test-integration:
       name: Integration tests
+      if: success()
       runs-on: ubuntu-latest
       steps:
       - name: Checkout code

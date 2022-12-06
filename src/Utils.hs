@@ -157,26 +157,6 @@ day5p2 = do
     stacks <- crateStacks
     print $ head <$> foldl (flip applyCommand9001) stacks commands
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---day 6
 
 isAllUnique :: Eq a => [a] -> Bool

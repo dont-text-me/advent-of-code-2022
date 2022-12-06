@@ -1,10 +1,11 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use <&>" #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+{-# OPTIONS_GHC -Wno-unused-matches #-}
 module Utils where
 
-import Data.List (intercalate, sort, intersect)
-import Data.Char (isLower)
+import Data.List (intercalate, sort, intersect, nub, groupBy)
+import Data.Char (isLower, isSpace, isDigit)
 import Data.List.Split
 ----day 1
 getCalsPerElf :: String -> IO [Int]
@@ -120,3 +121,77 @@ day4p1 = sum . map (\x -> if rangeContains (head x) (head $ tail x) then 1 else 
 
 day4p2 :: IO Int
 day4p2 = sum . map (\x -> if rangeOverlaps (head x) (head $ tail x) then 1 else 0) <$> ranges
+
+---day 5
+
+crateStacks :: IO [[String]]
+crateStacks = do
+    crates <- map (map (\x -> if '[' `notElem` x then "." else takeWhile (not . isSpace) x) . chunksOf 4) . takeWhile (/= "") . lines <$> readFile "inputs/day5.txt"
+    return [filter (/= ".") $ (!! pos) <$> crates | pos <- [0..8]]
+
+
+decodeCommand :: [Char] -> (Int, Int, Int)
+decodeCommand xs = (\x -> (x !! 0, x !! 1, x !! 2)) . map (\x -> read x :: Int) . filter (/=" ") . groupBy (\x y -> isDigit x && isDigit y) . (filter (\x -> isDigit x || isSpace x)) $ xs
+
+commandsDecode :: IO [(Int, Int, Int)]
+commandsDecode = map decodeCommand . tail . dropWhile (/= "") . lines <$> readFile "inputs/day5.txt"
+
+replaceXth :: Int -> a -> [a] -> [a]
+replaceXth x toReplace as = take x as ++ [toReplace] ++ drop (x + 1) as
+
+applyCommand :: (Int, Int, Int) -> [[String]] -> [[String]]
+applyCommand (amount, from, to) xs = replaceXth (from - 1) (drop amount (xs !! (from - 1))) (replaceXth (to - 1) (reverse (take amount (xs !! (from - 1))) ++ (xs !! (to - 1))) xs)
+
+applyCommand9001 :: (Int, Int, Int) -> [[String]] -> [[String]]
+applyCommand9001 (amount, from, to) xs = replaceXth (from - 1) (drop amount (xs !! (from - 1))) (replaceXth (to - 1) (take amount (xs !! (from - 1)) ++ (xs !! (to - 1))) xs)
+
+day5p1 :: IO()
+day5p1 = do
+    commands <- commandsDecode
+    stacks <- crateStacks
+    print $ head <$> foldl (flip applyCommand) stacks commands
+
+day5p2 :: IO()
+day5p2 = do
+    commands <- commandsDecode
+    stacks <- crateStacks
+    print $ head <$> foldl (flip applyCommand9001) stacks commands
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---day 6
+
+isAllUnique :: Eq a => [a] -> Bool
+isAllUnique xs = nub xs == xs
+
+
+findMarker :: Int -> Int -> String -> Int
+findMarker packetLength cnt xs | isAllUnique $ take packetLength xs = cnt + packetLength
+                  | otherwise = findMarker packetLength (cnt + 1) $ tail xs
+
+findMarker' :: Int -> String -> Int
+findMarker' packetLength = findMarker packetLength 0
+
+day6p1 :: IO Int
+day6p1 = readFile "inputs/day6.txt" >>= return . findMarker' 4 . concat . lines
+
+day6p2 :: IO Int
+day6p2 = readFile "inputs/day6.txt" >>= return . findMarker' 14 . concat . lines

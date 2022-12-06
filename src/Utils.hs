@@ -21,7 +21,7 @@ day1p2 = sum . take 3 <$> getCalsPerElf "inputs/day1.txt"
 
 data Outcome = Win | Loss | Draw deriving (Eq)
 
-data Move = Rock | Paper | Scissors deriving (Eq, Enum, Bounded)
+data Move = Rock | Paper | Scissors deriving (Eq, Enum, Bounded, Show)
 
 encoding :: String -> Move
 encoding x | x == "A" || x == "X" = Rock

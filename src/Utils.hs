@@ -2,6 +2,7 @@
 {-# HLINT ignore "Use <&>" #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 {-# OPTIONS_GHC -Wno-unused-matches #-}
+{-# HLINT ignore "Use head" #-}
 module Utils where
 
 import Data.List (intercalate, sort, intersect, nub, groupBy)
@@ -26,6 +27,7 @@ encoding :: String -> Move
 encoding x | x == "A" || x == "X" = Rock
            | x == "B" || x == "Y" = Paper
            | x == "C" || x == "Z" = Scissors
+           | otherwise = error "invalid character"
 
 wrapSucc :: (Enum a, Bounded a, Eq a) => a -> a
 wrapSucc x | x == maxBound = minBound
@@ -47,6 +49,7 @@ outcomeEncoding :: String -> Outcome
 outcomeEncoding "X" = Loss
 outcomeEncoding "Y" = Draw
 outcomeEncoding "Z" = Win
+outcomeEncoding _ = error "invalid character"
 
 points :: Outcome -> Int
 points Win = 6
@@ -131,7 +134,7 @@ crateStacks = do
 
 
 decodeCommand :: [Char] -> (Int, Int, Int)
-decodeCommand xs = (\x -> (x !! 0, x !! 1, x !! 2)) . map (\x -> read x :: Int) . filter (/=" ") . groupBy (\x y -> isDigit x && isDigit y) . (filter (\x -> isDigit x || isSpace x)) $ xs
+decodeCommand = (\x -> (x !! 0, x !! 1, x !! 2)) . map (\x -> read x :: Int) . filter (/=" ") . groupBy (\x y -> isDigit x && isDigit y) . filter (\x -> isDigit x || isSpace x)
 
 commandsDecode :: IO [(Int, Int, Int)]
 commandsDecode = map decodeCommand . tail . dropWhile (/= "") . lines <$> readFile "inputs/day5.txt"
